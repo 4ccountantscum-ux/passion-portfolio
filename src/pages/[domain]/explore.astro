@@ -1,0 +1,63 @@
+---
+// Browse page for a domain, e.g. /gym-atlas/explore.
+// For now: a reserved area for the future visual (catalog / map / network) plus a plain list.
+import type { GetStaticPaths } from 'astro';
+import SiteShell from '../../layouts/SiteShell.astro';
+import EntryCard from '../../components/EntryCard.astro';
+import MediaPlaceholder from '../../components/MediaPlaceholder.astro';
+import { domains, type Domain } from '../../domains';
+import { getEntriesByDomain } from '../../lib/entries';
+
+export const getStaticPaths = (() =>
+  domains.map((domain) => ({ params: { domain: domain.slug }, props: { domain } }))) satisfies GetStaticPaths;
+
+interface Props {
+  domain: Domain;
+}
+
+const { domain } = Astro.props;
+const entries = await getEntriesByDomain(domain.slug);
+
+// Group by kind when the domain defines kinds; otherwise one flat group.
+const groups = domain.kinds
+  ? [
+      ...domain.kinds.map((kind) => ({
+        label: kind.label,
+        entries: entries.filter((e) => e.data.kind === kind.id),
+      })),
+      {
+        label: 'Other',
+        entries: entries.filter((e) => !domain.kinds!.some((k) => k.id === e.data.kind)),
+      },
+    ].filter((g) => g.entries.length > 0)
+  : [{ label: 'All entries', entries }];
+---
+
+<SiteShell title={`${domain.name} · ${domain.explore.label}`} description={domain.explore.description} domain={domain}>
+  <section class="intro">
+    <p class="eyebrow"><a href={`/${domain.slug}`}>{domain.name}</a></p>
+    <h1>{domain.explore.label}</h1>
+    <p class="lede">{domain.explore.description}</p>
+  </section>
+
+  <section class="section">
+    <MediaPlaceholder label={`[Placeholder] ${domain.explore.label} view, not built yet`} />
+  </section>
+
+  {
+    entries.length > 0 ? (
+      groups.map((group) => (
+        <section class="section">
+          <h2>{group.label}</h2>
+          <div class="card-grid">
+            {group.entries.map((entry) => (
+              <EntryCard entry={entry} />
+            ))}
+          </div>
+        </section>
+      ))
+    ) : (
+      <p class="muted">No entries yet.</p>
+    )
+  }
+</SiteShell>

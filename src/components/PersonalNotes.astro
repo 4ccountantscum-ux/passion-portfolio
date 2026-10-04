@@ -1,0 +1,17 @@
+---
+// The entry's own written notes (the Markdown body of the entry file).
+
+interface Props {
+  /** True when the entry has no notes written yet. */
+  empty?: boolean;
+}
+
+const { empty = false } = Astro.props;
+---
+
+<section class="section notes" aria-labelledby="notes-heading">
+  <h2 id="notes-heading">Personal Notes</h2>
+  <div class="prose">
+    {empty ? <p class="muted">No notes written yet.</p> : <slot />}
+  </div>
+</section>

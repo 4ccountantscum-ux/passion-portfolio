@@ -1,0 +1,54 @@
+---
+// Key facts about an entry: kind, date, tags, and any domain-specific fields.
+import { getKindLabel } from '../domains';
+import { getEntryDomain, type Entry } from '../lib/entries';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const { kind, dateAdded, tags, fields } = entry.data;
+const domain = getEntryDomain(entry);
+
+const formatValue = (value: unknown): string => {
+  if (value === null || value === undefined) return '';
+  if (Array.isArray(value)) return value.map(formatValue).join(', ');
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+};
+
+const rows: { label: string; value: string }[] = [
+  ...(kind ? [{ label: 'Kind', value: getKindLabel(domain, kind)! }] : []),
+  ...(dateAdded ? [{ label: 'Added', value: formatValue(dateAdded) }] : []),
+  ...Object.entries(fields).map(([label, value]) => ({ label, value: formatValue(value) })),
+];
+---
+
+<section class="section metadata" aria-labelledby="metadata-heading">
+  <h2 id="metadata-heading">Details</h2>
+  {
+    rows.length > 0 ? (
+      <dl>
+        {rows.map((row) => (
+          <>
+            <dt>{row.label}</dt>
+            <dd>{row.value}</dd>
+          </>
+        ))}
+      </dl>
+    ) : (
+      <p class="muted">No details recorded yet.</p>
+    )
+  }
+  {
+    tags.length > 0 && (
+      <ul class="tags" aria-label="Tags">
+        {tags.map((tag) => (
+          <li>{tag}</li>
+        ))}
+      </ul>
+    )
+  }
+</section>

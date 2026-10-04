@@ -1,0 +1,59 @@
+---
+// Domain landing page, e.g. /equipment. One page is generated per domain in src/domains.ts.
+import type { GetStaticPaths } from 'astro';
+import SiteShell from '../../layouts/SiteShell.astro';
+import EntryCard from '../../components/EntryCard.astro';
+import { domains, type Domain } from '../../domains';
+import { getEntriesByDomain } from '../../lib/entries';
+
+export const getStaticPaths = (() =>
+  domains.map((domain) => ({ params: { domain: domain.slug }, props: { domain } }))) satisfies GetStaticPaths;
+
+interface Props {
+  domain: Domain;
+}
+
+const { domain } = Astro.props;
+const entries = await getEntriesByDomain(domain.slug);
+---
+
+<SiteShell title={domain.name} description={domain.summary} domain={domain}>
+  <section class="intro">
+    <p class="eyebrow">Domain</p>
+    <h1>{domain.name}</h1>
+    <p class="lede">{domain.description}</p>
+    <p>
+      <a class="button" href={`/${domain.slug}/explore`}>Open the {domain.explore.label} →</a>
+    </p>
+  </section>
+
+  {
+    domain.kinds && (
+      <section class="section" aria-labelledby="kinds-heading">
+        <h2 id="kinds-heading">What lives here</h2>
+        <ul class="kind-list">
+          {domain.kinds.map((kind) => (
+            <li>
+              {kind.label}: {entries.filter((e) => e.data.kind === kind.id).length}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="section" aria-labelledby="entries-heading">
+    <h2 id="entries-heading">Entries</h2>
+    {
+      entries.length > 0 ? (
+        <div class="card-grid">
+          {entries.map((entry) => (
+            <EntryCard entry={entry} />
+          ))}
+        </div>
+      ) : (
+        <p class="muted">No entries yet.</p>
+      )
+    }
+  </section>
+</SiteShell>

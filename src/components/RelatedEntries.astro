@@ -1,0 +1,28 @@
+---
+// Links from this entry to other entries, which may be in other domains.
+import { getEntries } from 'astro:content';
+import EntryCard from './EntryCard.astro';
+import type { Entry } from '../lib/entries';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const related = await getEntries(entry.data.related);
+---
+
+<section class="section related" aria-labelledby="related-heading">
+  <h2 id="related-heading">Related Entries</h2>
+  {
+    related.length > 0 ? (
+      <div class="card-grid">
+        {related.map((r) => (
+          <EntryCard entry={r} showDomain />
+        ))}
+      </div>
+    ) : (
+      <p class="muted">No connections yet.</p>
+    )
+  }
+</section>

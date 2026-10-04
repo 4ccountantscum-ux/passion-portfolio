@@ -1,0 +1,15 @@
+---
+// One domain tile on /domains: a visual area plus the domain name, linking to the domain.
+import type { Domain } from '../domains';
+
+interface Props {
+  domain: Domain;
+}
+
+const { domain } = Astro.props;
+---
+
+<a class="tile" href={`/${domain.slug}`}>
+  <span class="tile-visual" aria-hidden="true">[Placeholder] visual</span>
+  <span class="tile-name">{domain.name}</span>
+</a>

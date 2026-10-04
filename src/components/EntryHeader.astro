@@ -1,0 +1,27 @@
+---
+// Title block at the top of an entry page.
+import { getKindLabel } from '../domains';
+import { getEntryDomain, type Entry } from '../lib/entries';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const domain = getEntryDomain(entry);
+const kindLabel = getKindLabel(domain, entry.data.kind);
+---
+
+<header class="entry-header">
+  <p class="eyebrow">
+    <a href={`/${domain.slug}`}>{domain.name}</a>
+    {kindLabel && <span> · {kindLabel}</span>}
+  </p>
+  <h1>{entry.data.title}</h1>
+  <p class="lede">{entry.data.description}</p>
+  {
+    entry.data.placeholder && (
+      <p class="placeholder-flag">This is a placeholder entry, not real content.</p>
+    )
+  }
+</header>

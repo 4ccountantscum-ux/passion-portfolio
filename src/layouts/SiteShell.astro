@@ -1,0 +1,40 @@
+---
+// The global page frame: <head>, navigation and main content area.
+// `minimal` gives a bare frame with Home/About navigation (splash and /domains).
+// Otherwise the header shows PASSIONS + the DOMAINS dropdown.
+import Navigation from '../components/Navigation.astro';
+import { site } from '../site';
+import type { Domain } from '../domains';
+import '../styles/global.css';
+
+interface Props {
+  /** Page title; the site name is appended automatically. */
+  title?: string;
+  description?: string;
+  minimal?: boolean;
+  /** The domain this page belongs to, if any. */
+  domain?: Domain;
+}
+
+const { title, description = site.description, minimal = false, domain } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+  </head>
+  <body class:list={{ minimal }}>
+    <header class="site-header">
+      <Navigation minimal={minimal} domain={domain} />
+    </header>
+    <main class="site-main">
+      <slot />
+    </main>
+  </body>
+</html>

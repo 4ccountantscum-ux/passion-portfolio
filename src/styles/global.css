@@ -1,0 +1,422 @@
+/* Minimal global styles. Structure first; visual design comes later. */
+
+:root {
+  --bg: #fafaf8;
+  --fg: #1c1c1a;
+  --muted: #6b6b66;
+  --line: #d9d9d4;
+  --card: #ffffff;
+  --accent: #2f5d8a;
+  --flag-bg: #fff4d6;
+  --flag-fg: #6a4e00;
+  --max: 64rem;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161615;
+    --fg: #e8e8e3;
+    --muted: #9c9c95;
+    --line: #34342f;
+    --card: #1f1f1d;
+    --accent: #8ab4dc;
+    --flag-bg: #3a3014;
+    --flag-fg: #f0d68a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--accent);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- Shell ---------- */
+
+.site-header,
+.site-main {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.site-main {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+
+
+/* ---------- Navigation ---------- */
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 1rem 0;
+}
+
+.nav-identity {
+  font-weight: 600;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.nav-links a:hover,
+.nav-links a[aria-current='page'] {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* Domain pages: PASSIONS identity + DOMAINS dropdown */
+
+.nav-passions {
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.domains-menu {
+  position: relative;
+}
+
+.domains-menu summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.domains-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.domains-menu summary::after {
+  content: ' ▾';
+}
+
+.domains-menu summary:hover,
+.domains-menu[open] summary {
+  color: var(--fg);
+}
+
+.domains-menu ul {
+  position: absolute;
+  right: 0;
+  z-index: 10;
+  min-width: 12rem;
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+}
+
+.domains-menu ul a {
+  display: block;
+  padding: 0.4rem 1rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.domains-menu ul a:hover,
+.domains-menu ul a[aria-current] {
+  color: var(--accent);
+}
+
+/* ---------- Common blocks ---------- */
+
+.page-title {
+  margin: 1rem 0 2.5rem;
+  text-align: center;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  /* offset the trailing letter-spacing so the word looks centred */
+  margin-right: -0.3em;
+}
+
+.page-title ~ .prose {
+  margin-inline: auto;
+}
+
+.intro {
+  margin-bottom: 2rem;
+}
+
+.section {
+  margin: 2.5rem 0;
+}
+
+.lede {
+  font-size: 1.15rem;
+  max-width: 40rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.prose {
+  max-width: 40rem;
+}
+
+.placeholder-flag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  background: var(--flag-bg);
+  color: var(--flag-fg);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  text-decoration: none;
+}
+
+/* ---------- Cards ---------- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: block;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: inherit;
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+.card p {
+  margin: 0.25rem 0 0;
+}
+
+/* ---------- Minimal frame (splash and /domains) ---------- */
+
+.minimal .site-header {
+  border-bottom: none;
+}
+
+.nav-minimal {
+  justify-content: flex-end;
+  font-size: 0.85rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Splash ---------- */
+
+.splash {
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+}
+
+.splash-title {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  /* offset the trailing letter-spacing so the word looks centred */
+  margin-right: -0.35em;
+}
+
+.splash-title:hover {
+  color: var(--accent);
+}
+
+/* ---------- Domain tiles ---------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  margin: 4vh 0 0;
+  padding: 0;
+}
+
+.tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 24rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--fg);
+  text-decoration: none;
+  text-align: center;
+}
+
+.tile:hover {
+  border-color: var(--accent);
+}
+
+.tile-visual {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.tile-name {
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ---------- Entry page ---------- */
+
+.entry-header {
+  margin-bottom: 1.5rem;
+}
+
+.metadata dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1.25rem;
+  margin: 0;
+}
+
+.metadata dt {
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.metadata dd {
+  margin: 0;
+}
+
+.tags,
+.kind-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.tags li,
+.kind-list li {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+/* ---------- Media ---------- */
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.media-grid figure {
+  margin: 0;
+}
+
+.media-grid figcaption {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.35rem;
+}
+
+.media-empty {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  text-align: center;
+  padding: 1rem;
+}

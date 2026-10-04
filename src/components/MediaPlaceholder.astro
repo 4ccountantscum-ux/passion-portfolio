@@ -1,0 +1,35 @@
+---
+// Shows an entry's images, or a labelled empty box when there are none.
+// Also used on its own (with a `label`) to reserve space for future visuals like a map.
+
+interface MediaItem {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  media?: MediaItem[];
+  /** Text shown inside the empty box. */
+  label?: string;
+}
+
+const { media = [], label = 'No images yet' } = Astro.props;
+---
+
+{
+  media.length > 0 ? (
+    <div class="media-grid">
+      {media.map((item) => (
+        <figure>
+          <img src={item.src} alt={item.alt} loading="lazy" />
+          {item.caption && <figcaption>{item.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  ) : (
+    <div class="media-empty" role="img" aria-label={label}>
+      <span>{label}</span>
+    </div>
+  )
+}

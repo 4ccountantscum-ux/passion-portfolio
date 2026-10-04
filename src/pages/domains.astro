@@ -1,0 +1,19 @@
+---
+// The domain gateway: one tile per domain in src/domains.ts.
+import SiteShell from '../layouts/SiteShell.astro';
+import DomainTile from '../components/DomainTile.astro';
+import { domains } from '../domains';
+---
+
+<SiteShell title="Domains" minimal>
+  <h1 class="visually-hidden">Domains</h1>
+  <ul class="tiles">
+    {
+      domains.map((domain) => (
+        <li>
+          <DomainTile domain={domain} />
+        </li>
+      ))
+    }
+  </ul>
+</SiteShell>

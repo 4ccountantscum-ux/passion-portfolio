@@ -1,0 +1,67 @@
+---
+// Site navigation. Two variants:
+//   minimal — Home and About only (splash and /domains)
+//   default — PASSIONS identity + DOMAINS dropdown (domain pages and About)
+// Domain links come from src/domains.ts.
+import { domains, type Domain } from '../domains';
+
+interface Props {
+  minimal?: boolean;
+  /** The domain the current page belongs to, if any; highlighted in the dropdown. */
+  domain?: Domain;
+}
+
+const { minimal = false, domain } = Astro.props;
+
+const minimalLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+];
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+{
+  minimal ? (
+    <nav class="nav nav-minimal" aria-label="Main">
+      <ul class="nav-links">
+        {minimalLinks.map((link) => (
+          <li>
+            <a href={link.href} aria-current={path === link.href ? 'page' : undefined}>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  ) : (
+    <nav class="nav" aria-label="Main">
+      <a class="nav-identity nav-passions" href="/domains">Passions</a>
+      <details class="domains-menu">
+        <summary>Domains</summary>
+        <ul>
+          {domains.map((d) => (
+            <li>
+              <a href={`/${d.slug}`} aria-current={d.slug === domain?.slug ? 'true' : undefined}>
+                {d.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </nav>
+  )
+}
+
+<script>
+  // Close the DOMAINS dropdown when clicking anywhere outside it, or pressing Escape.
+  const closeMenus = (except?: EventTarget | null) => {
+    document.querySelectorAll<HTMLDetailsElement>('details.domains-menu[open]').forEach((menu) => {
+      if (!(except instanceof Node && menu.contains(except))) menu.open = false;
+    });
+  };
+  document.addEventListener('click', (event) => closeMenus(event.target));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMenus();
+  });
+</script>
