@@ -10,12 +10,20 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { createInterface } from 'node:readline';
-
-const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
-const ENTRIES_DIR = join(ROOT, 'src', 'content', 'entries');
-const TEMPLATES_DIR = join(ROOT, 'templates');
-const RESERVED = new Set(['explore']);
-const PARTIAL_DATE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+import {
+  ENTRIES_DIR,
+  PARTIAL_DATE,
+  ROOT,
+  TEMPLATES_DIR,
+  collectIds,
+  fillTemplate,
+  parseStatus,
+  slugify,
+  splitList,
+  today,
+  uniqueId,
+  yaml,
+} from './entry-tools.mjs';
 
 const [domain, ...nameParts] = process.argv.slice(2);
 const name = nameParts.join(' ').trim();
@@ -95,14 +103,14 @@ while (!base) {
 }
 rl.close();
 
-const taken = collectIds(ENTRIES_DIR);
+const taken = collectIds();
 const id = uniqueId(base, values.idHint, taken);
 const folder = join(ENTRIES_DIR, domain, id);
 if (existsSync(folder)) fail(`The folder ${relative(ROOT, folder)} already exists.`);
 
 Object.assign(values, { id, dateAdded: today() });
 const template = readFileSync(join(TEMPLATES_DIR, `${domain}.md`), 'utf8');
-const content = template.replace(/\{\{(\w+)\}\}/g, (match, key) => values[key] ?? match);
+const content = fillTemplate(template, values);
 
 mkdirSync(join(folder, 'photos'), { recursive: true });
 const file = join(folder, 'index.md');
@@ -120,63 +128,4 @@ Created ${relative(ROOT, file).replace(/\\/g, '/')}
 function fail(message) {
   console.error(message);
   process.exit(1);
-}
-
-/** Double-quoted YAML string (JSON strings are valid YAML). */
-function yaml(value) {
-  return JSON.stringify(value);
-}
-
-function parseStatus(answer) {
-  const a = answer.toLowerCase();
-  if (['v', 'visited'].includes(a)) return 'visited';
-  if (['w', 'want', 'want-to-visit', 'want to visit'].includes(a)) return 'want-to-visit';
-  return undefined;
-}
-
-function splitList(answer) {
-  return answer.split(',').map((s) => s.trim()).filter(Boolean);
-}
-
-function slugify(text) {
-  return text
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/['’]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-/** All ids already used by any entry, in any domain. */
-function collectIds(dir) {
-  const ids = new Set();
-  for (const item of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, item.name);
-    if (item.isDirectory()) {
-      collectIds(path).forEach((i) => ids.add(i));
-    } else if (item.name.endsWith('.md')) {
-      const match = readFileSync(path, 'utf8').match(/^id:\s*["']?([^"'\s#]+)/m);
-      if (match) ids.add(match[1]);
-    }
-  }
-  return ids;
-}
-
-/** base → base-<hint> → base-<hint>-2 → … until unused. */
-function uniqueId(base, hint, taken) {
-  const isFree = (candidate) => !taken.has(candidate) && !RESERVED.has(candidate);
-  if (isFree(base)) return base;
-  const withHint = hint ? `${base}-${slugify(hint)}` : base;
-  if (withHint !== base && isFree(withHint)) return withHint;
-  for (let n = 2; ; n++) {
-    if (isFree(`${withHint}-${n}`)) return `${withHint}-${n}`;
-  }
-}
-
-function today() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }

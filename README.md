@@ -9,7 +9,8 @@ A living, connected archive built with [Astro](https://astro.build). Each intere
 npm install      # first time only
 npm run dev      # local preview at http://localhost:4321
 npm run build    # builds the static site into dist/
-npm run new gym-atlas "Gym Name"   # creates a new Gym Atlas entry
+npm run import   # turns text files in inbox/ into Gym Atlas entries
+npm run new gym-atlas "Gym Name"   # creates one Gym Atlas entry by answering questions
 ```
 
 ## Where things live
@@ -21,8 +22,9 @@ npm run new gym-atlas "Gym Name"   # creates a new Gym Atlas entry
 | `src/content.config.ts` | The shared entry format |
 | `src/schemas/` | Domain-specific field rules (e.g. `gym-atlas.ts`) |
 | `src/content/entries/<domain>/` | One Markdown file per entry, or a folder (`index.md` + `photos/`) |
-| `templates/` | Starting files used by `npm run new` |
-| `scripts/` | The `npm run new` command |
+| `templates/` | Starting files: `gym-atlas.md` (entry template), `gym-atlas.txt` (import block) |
+| `scripts/` | The `npm run import` and `npm run new` commands |
+| `inbox/` | Your text files waiting to be imported (ignored by Git, never committed) |
 | `src/pages/` | Page templates (shared by all domains) |
 | `src/components/` | Reusable building blocks; domain templates in subfolders (e.g. `gym-atlas/`) |
 | `src/styles/global.css` | Minimal global styling |
@@ -65,11 +67,44 @@ The build stops with a clear message if an `id` is missing or duplicated, two en
 
 ## Adding a Gym Atlas entry
 
+### The quick way: a text block
+
+1. Copy `templates/gym-atlas.txt` into an `inbox/` folder at the top of the repository (any file name ending in `.txt`), and fill it in:
+
+   ```
+   Gym: Gym Name
+   City: City
+   Country: Country
+   Visited: 2026-10-03
+   Website: https://...
+   Notes:
+   Anything you like, over as many lines as you like.
+   ```
+
+2. Run:
+
+   ```bash
+   npm run import
+   ```
+
+- **Required:** `Gym`, `City`, `Country`. Every other line is optional. Blank lines are fine.
+- **Status** is worked out from `Visited`: dates mean visited, no dates mean want to visit. You can also write `Status: want to visit`.
+- **`Notes:` must come last.** Everything after it becomes the entry's notes.
+- **Several gyms in one file:** separate them with a line containing only `---`.
+- Lines starting with `#` are ignored, and labels ignore upper/lower case. `templates/gym-atlas.txt` lists every label.
+- **All or nothing per file:** if anything in a file is wrong (a missing city, a date like "May 2024", an unknown label, a gym that already exists), nothing from that file is imported and the message says what to fix. Fix it and run `npm run import` again.
+- **Imported files move to `inbox/imported/`.** The whole `inbox/` folder is ignored by Git, but everything that ends up in an entry is public.
+- If `npm run dev` is running, new entries appear in the preview right away. If they don't (for example after running `npm run build` at the same time), restart `npm run dev`.
+
+### The question-by-question way
+
 ```bash
 npm run new gym-atlas "Gym Name"
 ```
 
-It asks four quick questions (city, country, visited or want to visit, and visit date if visited), then creates:
+It asks for the city, country, visited or want to visit, and visit date if visited.
+
+### What both commands create
 
 ```
 src/content/entries/gym-atlas/<id>/index.md   ← the entry; fill in the rest whenever
@@ -78,7 +113,7 @@ src/content/entries/gym-atlas/<id>/photos/    ← drop photos here
 
 - The `id` is made from the gym name (e.g. "Gym Name" → `gym-name`). If that id is already taken, the city is added (`gym-name-city`), then a number.
 - `dateAdded` is today. `slug` is left out, so it equals the id.
-- The template is `templates/gym-atlas.md`; the rules are in `src/schemas/gym-atlas.ts`.
+- The entry template is `templates/gym-atlas.md`; the rules are in `src/schemas/gym-atlas.ts`.
 
 **Required:** `title` (gym name), `fields.location.city`, `fields.location.country`, `fields.status` (`visited` or `want-to-visit`), and `fields.visitDates` when visited. Dates can be loose: `"2024"`, `"2024-05"` or `"2024-05-12"`.
 **Optional:** everything else. Leave fields blank until you know them; blank fields are hidden on the page.

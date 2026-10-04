@@ -1,0 +1,35 @@
+# Copy this file into inbox/, fill it in, then run:  npm run import
+# Lines starting with # are ignored. Everything else ends up on the public site and in the repository.
+#
+# Only Gym, City and Country are required. Delete any line you don't need.
+# Status is worked out from Visited: dates mean visited, no dates mean want to visit.
+# Visited dates can be loose: 2024, 2024-05 or 2024-05-12. Separate several with commas.
+# Notes must come last: everything after "Notes:" becomes the entry's notes.
+# Several gyms in one file: separate them with a line containing only ---
+#
+# Optional labels (lists are comma-separated):
+#   Status:             visited  or  want to visit
+#   Region:             state / province
+#   Neighborhood:
+#   Address:
+#   Coordinates:        latitude, longitude   e.g. 40.7128, -74.0060
+#   Founded:
+#   Vibe:               a short phrase
+#   Went with:          Name, Name
+#   Heard about:        how I heard about it
+#   People met:         Name, Name
+#   Notable people:     Name, Name
+#   Notable equipment:  Item, Item
+#   Food:               Place, Place
+#   Attractions:        Place, Place
+#   Source:             https://...   or   Title | https://...   (repeat the line for more)
+#   Description:        one-line summary
+#   Related:            entry-id, entry-id
+#   Tags:               tag, tag
+
+Gym:
+City:
+Country:
+Visited:
+Website:
+Notes:
