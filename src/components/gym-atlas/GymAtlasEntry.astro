@@ -1,0 +1,147 @@
+---
+// Gym Atlas entry page body. Sections with nothing filled in are hidden.
+//
+// Order: header (name, location, status) → photos → key facts → notes → videos →
+// people → notable equipment → around the gym → discovery (how I heard + sources) → related.
+import { render } from 'astro:content';
+import EntryHeader from '../EntryHeader.astro';
+import MediaPlaceholder from '../MediaPlaceholder.astro';
+import PersonalNotes from '../PersonalNotes.astro';
+import Videos from '../Videos.astro';
+import Sources from '../Sources.astro';
+import RelatedEntries from '../RelatedEntries.astro';
+import { hasNotes, type Entry } from '../../lib/entries';
+import { formatLocation, formatPartialDate, gymAtlasFields } from '../../schemas/gym-atlas';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const gym = gymAtlasFields.parse(entry.data.fields);
+
+const lastVisit = gym.visitDates.at(-1);
+const statusLabel =
+  gym.status === 'visited'
+    ? `Visited${lastVisit ? ` · ${formatPartialDate(lastVisit)}` : ''}`
+    : 'Want to visit';
+
+const facts = [
+  { label: 'Visits', value: gym.visitDates.map(formatPartialDate).join(', ') },
+  { label: 'Founded', value: gym.founded },
+  { label: 'Vibe', value: gym.vibe },
+  { label: 'Address', value: gym.location.address },
+].filter((f) => f.value);
+
+const people = [
+  { label: 'Went with', items: gym.wentWith },
+  { label: 'People met', items: gym.peopleMet },
+  { label: 'Notable people who train here', items: gym.notablePeople },
+].filter((g) => g.items.length > 0);
+
+const around = [
+  { label: 'Food nearby', items: gym.nearbyFood },
+  { label: 'Attractions nearby', items: gym.nearbyAttractions },
+].filter((g) => g.items.length > 0);
+
+const hasDiscovery = Boolean(gym.heardAbout) || entry.data.sources.length > 0;
+---
+
+<article class="entry gym-entry">
+  <EntryHeader entry={entry}>
+    <p class="gym-location">{formatLocation(gym.location)}</p>
+    <p class:list={['gym-status', `gym-status-${gym.status}`]}>{statusLabel}</p>
+  </EntryHeader>
+
+  <section class="section">
+    <MediaPlaceholder photos={entry.data.photos} fallbackAlt={entry.data.title} />
+  </section>
+
+  {
+    facts.length > 0 && (
+      <section class="section metadata" aria-labelledby="facts-heading">
+        <h2 id="facts-heading">Details</h2>
+        <dl>
+          {facts.map((f) => (
+            <>
+              <dt>{f.label}</dt>
+              <dd>{f.value}</dd>
+            </>
+          ))}
+        </dl>
+      </section>
+    )
+  }
+
+  <PersonalNotes empty={!hasNotes(entry)}>
+    <Content />
+  </PersonalNotes>
+
+  <Videos videos={entry.data.videos} />
+
+  {
+    people.length > 0 && (
+      <section class="section" aria-labelledby="people-heading">
+        <h2 id="people-heading">People</h2>
+        {people.map((g) => (
+          <div class="gym-group">
+            <h3>{g.label}</h3>
+            <ul>
+              {g.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    )
+  }
+
+  {
+    gym.notableEquipment.length > 0 && (
+      <section class="section" aria-labelledby="equipment-heading">
+        <h2 id="equipment-heading">Notable equipment</h2>
+        <ul>
+          {gym.notableEquipment.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    around.length > 0 && (
+      <section class="section" aria-labelledby="around-heading">
+        <h2 id="around-heading">Around the gym</h2>
+        {around.map((g) => (
+          <div class="gym-group">
+            <h3>{g.label}</h3>
+            <ul>
+              {g.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    )
+  }
+
+  {
+    hasDiscovery && (
+      <section class="section" aria-labelledby="discovery-heading">
+        <h2 id="discovery-heading">Discovery</h2>
+        {gym.heardAbout && (
+          <p>
+            <span class="muted">How I heard about it:</span> {gym.heardAbout}
+          </p>
+        )}
+        <Sources sources={entry.data.sources} heading="Sources" />
+      </section>
+    )
+  }
+
+  <RelatedEntries entry={entry} />
+</article>

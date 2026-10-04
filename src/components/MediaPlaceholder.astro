@@ -1,29 +1,38 @@
 ---
-// Shows an entry's images, or a labelled empty box when there are none.
+// Shows an entry's photos (resized automatically), or a labelled empty box when there are none.
 // Also used on its own (with a `label`) to reserve space for future visuals like a map.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 
-interface MediaItem {
-  src: string;
-  alt: string;
+interface Photo {
+  src: ImageMetadata;
+  alt?: string;
   caption?: string;
 }
 
 interface Props {
-  media?: MediaItem[];
+  photos?: Photo[];
+  /** Used as alt text when a photo has neither alt nor caption. */
+  fallbackAlt?: string;
   /** Text shown inside the empty box. */
   label?: string;
 }
 
-const { media = [], label = 'No images yet' } = Astro.props;
+const { photos = [], fallbackAlt = '', label = 'No photos yet' } = Astro.props;
 ---
 
 {
-  media.length > 0 ? (
+  photos.length > 0 ? (
     <div class="media-grid">
-      {media.map((item) => (
+      {photos.map((photo) => (
         <figure>
-          <img src={item.src} alt={item.alt} loading="lazy" />
-          {item.caption && <figcaption>{item.caption}</figcaption>}
+          <Image
+            src={photo.src}
+            alt={photo.alt ?? photo.caption ?? fallbackAlt}
+            widths={[400, 800, 1200]}
+            sizes="(max-width: 640px) 100vw, 400px"
+          />
+          {photo.caption && <figcaption>{photo.caption}</figcaption>}
         </figure>
       ))}
     </div>

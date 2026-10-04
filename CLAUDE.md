@@ -90,7 +90,9 @@ These are structural decisions. Do not change them without approval.
 - Store each relationship once, in one direction. Backlinks and reverse relationships are computed later, never duplicated by hand.
 - `dateAdded` is required and means when the entry was added to the archive, not when the thing itself happened.
 - `kind` means what the thing is (teacher, concept, book, …), never a status.
-- Gym Atlas status such as visited / want-to-visit must be modeled separately from `kind` when the real Gym Atlas schema is added.
+- Gym Atlas status (visited / want-to-visit) is `fields.status`, separate from `kind`. Gym Atlas field rules live in `src/schemas/gym-atlas.ts`; its template in `templates/gym-atlas.md`.
+- Treat everything stored in the repository as potentially public. There are no private or hidden fields.
+- Entry photos live next to their entry (`<entry-folder>/photos/`) and are resized by Astro. Videos are links, not files.
 - Sources, books, documents and personal experiences can exist as entries in their own right.
 
 ## Implementation principles

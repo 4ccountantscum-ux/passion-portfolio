@@ -8,7 +8,10 @@ tags: ["placeholder"]
 related:
   - placeholder-equipment
 fields:
-  example field: "[Placeholder] Location and coordinates will go here once the Gym Atlas schema is defined."
+  location:
+    city: "[Placeholder city]"
+    country: "[Placeholder country]"
+  status: want-to-visit
 ---
 
 [Placeholder] Personal notes about this gym go here: the atmosphere, the equipment, the visit.

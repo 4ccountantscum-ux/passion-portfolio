@@ -5,6 +5,9 @@
 //   2. Create a folder with the same `slug` in src/content/entries/.
 // Its landing page, explore page, entry pages and nav link are created automatically.
 
+import type { ZodType } from 'astro/zod';
+import { describeGym, gymAtlasFields } from './schemas/gym-atlas';
+
 export interface EntryKind {
   /** Value used in an entry's `kind` field, e.g. "teacher". */
   id: string;
@@ -30,6 +33,13 @@ export interface Domain {
   };
   /** Optional sub-types of entries in this domain (e.g. teachers and concepts). */
   kinds?: EntryKind[];
+  /**
+   * Optional rules for the `fields` block of this domain's entries, checked at build time.
+   * Domains without rules accept any `fields`.
+   */
+  fieldsSchema?: ZodType;
+  /** Optional fallback text for cards when an entry has no description. */
+  describe?: (fields: unknown) => string | undefined;
 }
 
 export const domains: Domain[] = [
@@ -43,8 +53,10 @@ export const domains: Domain[] = [
       label: 'Map',
       description: 'Explore gyms geographically. An interactive map/globe will live here later.',
     },
-    // No kinds yet. Visit status (visited / want to visit) is a status, not a kind;
-    // it will be modeled separately in the future Gym Atlas schema.
+    // No kinds. Visit status (visited / want-to-visit) is a status, not a kind:
+    // it lives in `fields.status` (see src/schemas/gym-atlas.ts).
+    fieldsSchema: gymAtlasFields,
+    describe: describeGym,
   },
   {
     slug: 'equipment',

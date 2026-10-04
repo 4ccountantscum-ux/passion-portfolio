@@ -6,6 +6,7 @@
 //   folder           primary domain, which decides where the entry is shown
 
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { z } from 'astro/zod';
 import { getDomain, type Domain } from '../domains';
 
 export type Entry = CollectionEntry<'entries'>;
@@ -38,11 +39,28 @@ export function entryUrl(entry: Entry): string {
   return `/${getEntryDomain(entry).slug}/${entry.data.slug}`;
 }
 
-/** All entries, validated against the domain list, reserved slugs and URL collisions. */
+/** True when the entry has written notes (HTML comments, like template hints, don't count). */
+export function hasNotes(entry: Entry): boolean {
+  return Boolean(entry.body?.replace(/<!--[\s\S]*?-->/g, '').trim());
+}
+
+/** Short text for cards: the description, or a domain-provided fallback (e.g. a gym's location). */
+export function entrySummary(entry: Entry): string | undefined {
+  return entry.data.description ?? getEntryDomain(entry).describe?.(entry.data.fields);
+}
+
+/** All entries, validated against the domain list, domain field rules, reserved slugs and URL collisions. */
 export async function getAllEntries(): Promise<Entry[]> {
   const all = await getCollection('entries');
   const urls = new Map<string, string>();
   for (const entry of all) {
+    const { fieldsSchema } = getEntryDomain(entry);
+    const checked = fieldsSchema?.safeParse(entry.data.fields);
+    if (checked && !checked.success) {
+      throw new Error(
+        `Entry "${entry.id}" (${entry.filePath}) has invalid fields:\n${z.prettifyError(checked.error)}`,
+      );
+    }
     const slug = entry.data.slug;
     if (RESERVED_SLUGS.has(slug)) {
       throw new Error(`Entry "${entry.id}" uses the reserved slug "${slug}". Give it a different slug.`);

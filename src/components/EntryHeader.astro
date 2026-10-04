@@ -1,5 +1,5 @@
 ---
-// Title block at the top of an entry page.
+// Title block at the top of an entry page. Domain templates can add lines via the default slot.
 import { getKindLabel } from '../domains';
 import { getEntryDomain, type Entry } from '../lib/entries';
 
@@ -18,7 +18,8 @@ const kindLabel = getKindLabel(domain, entry.data.kind);
     {kindLabel && <span> · {kindLabel}</span>}
   </p>
   <h1>{entry.data.title}</h1>
-  <p class="lede">{entry.data.description}</p>
+  <slot />
+  {entry.data.description && <p class="lede">{entry.data.description}</p>}
   {
     entry.data.placeholder && (
       <p class="placeholder-flag">This is a placeholder entry, not real content.</p>

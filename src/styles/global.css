@@ -420,3 +420,37 @@ img {
   text-align: center;
   padding: 1rem;
 }
+
+/* ---------- Gym Atlas entry ---------- */
+
+.gym-location {
+  margin: 0.25rem 0 0;
+  font-size: 1.05rem;
+}
+
+.gym-status {
+  display: inline-block;
+  margin: 0.75rem 0 0;
+  padding: 0.15rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.gym-status-visited {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.gym-group h3 {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.gym-group ul {
+  margin: 0;
+}

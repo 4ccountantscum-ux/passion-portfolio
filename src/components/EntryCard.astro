@@ -1,7 +1,7 @@
 ---
 // A compact link card for one entry.
 import { getKindLabel } from '../domains';
-import { entryUrl, getEntryDomain, type Entry } from '../lib/entries';
+import { entrySummary, entryUrl, getEntryDomain, type Entry } from '../lib/entries';
 
 interface Props {
   entry: Entry;
@@ -12,11 +12,12 @@ interface Props {
 const { entry, showDomain = false } = Astro.props;
 const domain = getEntryDomain(entry);
 const kindLabel = getKindLabel(domain, entry.data.kind);
+const summary = entrySummary(entry);
 const eyebrow = [showDomain ? domain.name : null, kindLabel].filter(Boolean).join(' · ');
 ---
 
 <a class="card entry-card" href={entryUrl(entry)}>
   {eyebrow && <p class="eyebrow">{eyebrow}</p>}
   <h3>{entry.data.title}</h3>
-  <p>{entry.data.description}</p>
+  {summary && <p>{summary}</p>}
 </a>

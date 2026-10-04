@@ -1,0 +1,26 @@
+---
+// An entry's videos, listed as links. Hidden when there are none.
+
+interface Props {
+  videos: { url: string; caption?: string }[];
+}
+
+const { videos } = Astro.props;
+---
+
+{
+  videos.length > 0 && (
+    <section class="section videos" aria-labelledby="videos-heading">
+      <h2 id="videos-heading">Videos</h2>
+      <ul>
+        {videos.map((video) => (
+          <li>
+            <a href={video.url} rel="noopener">
+              {video.caption ?? video.url}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
